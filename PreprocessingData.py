@@ -3,27 +3,29 @@ import numpy as np
 import csv
 import glob
 
-label = "Parasitized"
+label = "Parasitized"                                            # Will run the script once again for "uninfected"
 dirList = glob.glob("cell_images/"+label+"/*.png")
 file = open("csv/dataset.csv","a")
 
 for img_path in dirList:
-
-	im = cv2.imread(img_path)
 	
+	# Reading the image
+	im = cv2.imread(img_path) 
+	
+	# Smoothening the image using a mask of 5 by 5
 	im = cv2.GaussianBlur(im,(5,5),2)
-
-
-
+	
+	# Converting the image to Greyscale
 	im_gray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
-
+	
+	# Implementing a feature extraction technique -> Contour Detection and store the areas of these contours as the features
+	# Reason : For uninfected cell, there will be only one large contour which is not the case with Parasitized cell where we will get multiple contours
 	ret,thresh = cv2.threshold(im_gray,127,255,0)
 	contours,_ = cv2.findContours(thresh,1,2)
 	
 	for contour in contours:
 		cv2.drawContours(im_gray, contours, -1, (0,255,0), 3)
 	
-
 	cv2.imshow("window",im_gray)
 
 	break
